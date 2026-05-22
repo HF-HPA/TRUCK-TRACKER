@@ -2,233 +2,915 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Company Greenhouse</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HF-HPA TRUCK TRACKER</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg: #F4F7F3;
-      --card: #ffffff;
-      --green: #2F6F4E;
-      --sage: #A8C3A1;
-      --earth: #C9B89B;
-      --text: #1F2933;
-      --muted: #6b7280;
+    :root{
+      /* Night greenhouse / premium ops palette */
+      --bg:#0B1410;
+      --bg2:#0E1B15;
+      --text:#E7EEE9;
+      --muted:#9FB1A8;
+      --green:#7EC9A5;
+      --green2:#3B7A60;
+      --earth:#8E8367;
+
+      --glass: rgba(255,255,255,0.07);
+      --glass2: rgba(255,255,255,0.10);
+      --stroke: rgba(255,255,255,0.10);
+      --stroke2: rgba(126,201,165,0.18);
+      --shadow: 0 20px 60px rgba(0,0,0,0.55);
+
+      --radius: 22px;
     }
 
-    body.dark {
-      --bg: #0F1A14;
-      --card: #16251D;
-      --green: #7CBF9E;
-      --sage: #3E6B56;
-      --earth: #8A7F63;
-      --text: #E5E7EB;
-      --muted: #9CA3AF;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Inter, sans-serif;
-      background: var(--bg);
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
-      transition: background 0.6s ease, color 0.6s ease;
-      overflow-x: hidden;
-    }
-
-    /* Greenhouse light */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
       background:
-        radial-gradient(circle at top left, rgba(168,195,161,0.25), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(201,184,155,0.25), transparent 55%);
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(1200px 700px at 15% 10%, rgba(126,201,165,0.14), transparent 60%),
+        radial-gradient(900px 550px at 90% 80%, rgba(142,131,103,0.12), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      overflow-x:hidden;
     }
 
-    header {
-      padding: 36px 48px;
-      position: relative;
-      z-index: 1;
+    /* Subtle “glasshouse” grid texture */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 64px 64px, 64px 64px;
+      opacity:0.22;
+      pointer-events:none;
+      z-index:0;
     }
 
-    h1 {
-      font-family: "Playfair Display", serif;
-      font-size: 42px;
-      margin: 0;
-      color: var(--green);
+    /* Decorative plant silhouettes */
+    .plant{
+      position:fixed;
+      bottom:-48px;
+      opacity:0.12;
+      z-index:0;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,0.55));
+    }
+    .plant.left{ left:-64px; width:240px; }
+    .plant.right{ right:-74px; width:290px; opacity:0.10; }
+
+    header{
+      position:relative;
+      z-index:1;
+      padding: 28px 44px 14px;
+      display:flex;
+      gap:16px;
+      align-items:flex-end;
+      flex-wrap:wrap;
     }
 
-    .subtitle {
-      margin-top: 8px;
+    .titleBlock{ display:flex; flex-direction:column; gap:6px; }
+    h1{
+      margin:0;
+      font-family:"Playfair Display", serif;
+      font-weight:700;
+      font-size: 40px;
+      letter-spacing: 0.4px;
+      color: var(--text);
+    }
+    .sub{
       color: var(--muted);
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      flex-wrap: wrap;
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-size: 13px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(126,201,165,0.12);
     }
 
-    .controls {
-      margin-left: auto;
-      display: flex;
+    .toolbar{
+      margin-left:auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      cursor:pointer;
+      border-radius: 999px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      font-size: 13px;
+      display:inline-flex; gap:8px; align-items:center;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.09); border-color: rgba(126,201,165,0.22); }
+    .btn:active{ transform: translateY(0px); }
+
+    .dateInput{
+      border-radius: 999px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(10,20,16,0.35);
+      color: var(--text);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 13px;
+      outline:none;
+    }
+    .dateInput::-webkit-calendar-picker-indicator{ filter: invert(1) opacity(.7); }
+
+    main{
+      position:relative; z-index:1;
+      padding: 18px 44px 60px;
+    }
+
+    /* Week strip */
+    .weekGrid{
+      display:grid;
+      grid-template-columns: repeat(7, minmax(240px, 1fr));
+      gap: 18px;
+      align-items:start;
+      overflow-x:auto;
+      padding-bottom: 12px;
+      scroll-snap-type: x mandatory;
+    }
+    .weekGrid::-webkit-scrollbar{ height:10px; }
+    .weekGrid::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,0.10);
+      border-radius: 999px;
+    }
+
+    .dayCard{
+      scroll-snap-align: start;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow:hidden;
+      position:relative;
+      min-height: 420px;
+      animation: fadeUp .55s ease both;
+    }
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(14px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    /* Glass rim highlight */
+    .dayCard::before{
+      content:"";
+      position:absolute; inset:0;
+      border-radius: var(--radius);
+      padding:1px;
+      background: linear-gradient(135deg, rgba(126,201,165,0.35), rgba(255,255,255,0.08), rgba(142,131,103,0.22));
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
+      opacity:.75;
+    }
+
+    .dayHeader{
+      padding: 16px 16px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .dayTopRow{
+      display:flex;
+      gap:10px;
+      align-items:baseline;
+      justify-content:space-between;
+    }
+    .dayName{
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.2px;
+    }
+    .dayDate{
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .divider{
+      height:1px;
+      width:100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(126,201,165,0.22), rgba(255,255,255,0.06));
+      margin-top: 4px;
+    }
+
+    .dayActions{
+      display:flex;
+      gap:8px;
+      margin-top: 6px;
+      flex-wrap:wrap;
+    }
+    .miniBtn{
+      cursor:pointer;
+      border-radius: 12px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-size: 12px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+    }
+    .miniBtn:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.08); border-color: rgba(126,201,165,0.22); }
+
+    .truckList{
+      padding: 0 14px 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .truckRow{
+      border-radius: 16px;
+      background: rgba(10,20,16,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 12px;
+      display:grid;
+      grid-template-columns: 1.2fr 1.2fr 0.9fr 0.9fr 0.7fr;
+      gap: 10px;
+      align-items:center;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .truckRow:hover{
+      transform: translateY(-2px);
+      border-color: rgba(126,201,165,0.20);
+      background: rgba(10,20,16,0.42);
+    }
+
+    .cell{
+      display:flex; flex-direction:column; gap:4px;
+      min-width:0;
+    }
+    .k{
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space:nowrap;
+    }
+    .v{
+      font-size: 13px;
+      color: var(--text);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .recv{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .checkWrap{
+      display:flex; align-items:center; gap:8px;
+      justify-content:flex-end;
+    }
+
+    /* Custom checkbox */
+    .chk{
+      appearance:none;
+      -webkit-appearance:none;
+      width: 18px; height:18px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      cursor:pointer;
+      position:relative;
+      outline:none;
+      transition: background .15s ease, border-color .15s ease, transform .1s ease;
+    }
+    .chk:hover{ transform: scale(1.03); border-color: rgba(126,201,165,0.30); }
+    .chk:checked{
+      background: rgba(126,201,165,0.26);
+      border-color: rgba(126,201,165,0.55);
+    }
+    .chk:checked::after{
+      content:"";
+      position:absolute;
+      left:5px; top:2px;
+      width:6px; height:10px;
+      border-right: 2px solid var(--text);
+      border-bottom: 2px solid var(--text);
+      transform: rotate(40deg);
+      opacity: 0.95;
+    }
+
+    .rowTools{
+      display:flex; gap:8px; justify-content:flex-end;
+      margin-top: 2px;
+    }
+    .iconBtn{
+      cursor:pointer;
+      border:none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 0;
+      transition: color .15s ease;
+    }
+    .iconBtn:hover{ color: var(--text); }
+    .received{
+      opacity: 0.62;
+    }
+    .received .v{
+      text-decoration: line-through;
+      text-decoration-color: rgba(126,201,165,0.35);
+    }
+
+    .emptyState{
+      padding: 14px;
+      margin: 0 14px 14px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,0.14);
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+
+    /* Modal */
+    .modalBack{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,0.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 50;
+      padding: 18px;
+    }
+    .modal{
+      width: min(720px, 96vw);
+      border-radius: 22px;
+      background: rgba(20,35,28,0.70);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 28px 90px rgba(0,0,0,0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow:hidden;
+    }
+    .modalHead{
+      padding: 16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .modalHead h3{
+      margin:0;
+      font-family:"Playfair Display", serif;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .closeX{
+      cursor:pointer;
+      border:none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .closeX:hover{ color: var(--text); }
+
+    .modalBody{
+      padding: 16px 18px 18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    button {
-      background: var(--card);
-      border: 1px solid rgba(0,0,0,0.08);
-      padding: 8px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-size: 13px;
-      color: var(--text);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 28px;
-      padding: 24px 48px 80px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 22px;
-      padding: 26px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.12);
-      animation: fadeUp 0.7s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .card h2 {
-      font-family: "Playfair Display", serif;
-      margin-top: 0;
-      color: var(--green);
-    }
-
-    .metric {
-      font-size: 38px;
-      font-weight: 600;
-      margin-top: 12px;
-    }
-
-    .label {
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field label{
+      font-size: 12px;
       color: var(--muted);
-      font-size: 14px;
+    }
+    .field input{
+      border-radius: 14px;
+      padding: 11px 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(10,20,16,0.45);
+      color: var(--text);
+      outline:none;
+    }
+    .field input:focus{
+      border-color: rgba(126,201,165,0.35);
+      box-shadow: 0 0 0 4px rgba(126,201,165,0.10);
     }
 
-    /* Decorative plants */
-    .plant {
-      position: fixed;
-      bottom: -20px;
-      opacity: 0.12;
-      z-index: 0;
+    .modalFoot{
+      padding: 14px 18px 18px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      border-top: 1px solid rgba(255,255,255,0.10);
     }
 
-    .plant.left {
-      left: -40px;
-      width: 220px;
-    }
-
-    .plant.right {
-      right: -40px;
-      width: 260px;
+    @media (max-width: 860px){
+      header{ padding: 24px 18px 12px; }
+      main{ padding: 12px 18px 50px; }
+      h1{ font-size: 32px; }
+      .weekGrid{ grid-template-columns: repeat(7, minmax(235px, 1fr)); }
+      .modalBody{ grid-template-columns: 1fr; }
+      .truckRow{ grid-template-columns: 1fr 1fr; }
+      .recv{ grid-column: 1 / -1; }
+      .rowTools{ justify-content:flex-start; }
     }
   </style>
 </head>
 
 <body>
 
-<!-- Decorative SVG Plants -->
-<svg class="plant left" viewBox="0 0 200 400">
-  <path d="M100 400 C60 300 120 200 80 100" stroke="#2F6F4E" stroke-width="14" fill="none"/>
-  <path d="M100 400 C140 300 80 200 120 100" stroke="#2F6F4E" stroke-width="14" fill="none"/>
-</svg>
+  <!-- Decorative plants -->
+  <svg class="plant left" viewBox="0 0 200 400" aria-hidden="true">
+    <path d="M100 400 C60 300 120 200 80 100" stroke="#7EC9A5" stroke-width="14" fill="none"/>
+    <path d="M100 400 C140 300 80 200 120 100" stroke="#7EC9A5" stroke-width="14" fill="none"/>
+  </svg>
+  <svg class="plant right" viewBox="0 0 200 400" aria-hidden="true">
+    <path d="M100 400 C50 260 140 180 90 60" stroke="#7EC9A5" stroke-width="16" fill="none"/>
+  </svg>
 
-<svg class="plant right" viewBox="0 0 200 400">
-  <path d="M100 400 C50 260 140 180 90 60" stroke="#2F6F4E" stroke-width="16" fill="none"/>
-</svg>
+  <header>
+    <div class="titleBlock">
+      <h1>HF-HPA TRUCK TRACKER</h1>
+      <div class="sub">
+        <span class="pill"><span class="dot"></span> Live board (this device) · <span id="lastSaved">Saved</span></span>
+        <span class="pill">Week: <span id="weekLabel"></span></span>
+      </div>
+    </div>
 
-<header>
-  <h1>Company Greenhouse 🌿</h1>
-  <div class="subtitle">
-    Live performance · Last updated <span id="updated"></span>
-    <div class="controls">
-      <button onclick="toggleDark()">🌙 Night</button>
-      <button onclick="toggleSound()">🔊 Ambience</button>
+    <div class="toolbar">
+      <input class="dateInput" id="weekPicker" type="date" />
+      <button class="btn" id="todayBtn" type="button">📅 Jump to this week</button>
+      <button class="btn" id="exportBtn" type="button" title="Copies the week JSON to clipboard">📋 Copy Week Data</button>
+      <button class="btn" id="clearBtn" type="button" title="Clears only this week from storage">🧹 Clear Week</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="weekGrid" id="weekGrid" aria-label="Inbound truck tracker week grid"></section>
+  </main>
+
+  <!-- Add/Edit Modal -->
+  <div class="modalBack" id="modalBack" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modalHead">
+        <h3 id="modalTitle">Add Truck</h3>
+        <button class="closeX" type="button" id="closeModal" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="field">
+          <label for="fDate">Arrival Date</label>
+          <input id="fDate" type="text" readonly />
+        </div>
+
+        <div class="field">
+          <label for="fTime">Expected Time</label>
+          <input id="fTime" type="time" />
+        </div>
+
+        <div class="field">
+          <label for="fTruckType">Truck Type</label>
+          <input id="fTruckType" type="text" placeholder="e.g., CC Racks, Pallets, Floor Stack..." />
+        </div>
+
+        <div class="field">
+          <label for="fVendor">Vendor (coming from)</label>
+          <input id="fVendor" type="text" placeholder="e.g., Anchor, Omega, Legacy..." />
+        </div>
+
+        <div class="field" style="grid-column:1 / -1;">
+          <label for="fPO">PO Number</label>
+          <input id="fPO" type="text" placeholder="e.g., 23156" />
+        </div>
+      </div>
+
+      <div class="modalFoot">
+        <button class="btn" type="button" id="cancelBtn">Cancel</button>
+        <button class="btn" type="button" id="saveBtn">💾 Save</button>
+      </div>
     </div>
   </div>
-</header>
 
-<section class="grid">
-  <div class="card">
-    <h2>Weekly Sales</h2>
-    <div class="metric" id="weekly">$0</div>
-    <div class="label">Week to date</div>
-  </div>
+  <script>
+    /***********************
+     * HF-HPA TRUCK TRACKER
+     * - Week view Monday-Sunday
+     * - Data saved to localStorage
+     ***********************/
+    const STORAGE_KEY = "hf_hpa_truck_tracker_v1";
 
-  <div class="card">
-    <h2>Month‑to‑Date</h2>
-    <div class="metric" id="mtd">$0</div>
-    <div class="label">All teams</div>
-  </div>
+    const weekGrid = document.getElementById("weekGrid");
+    const weekLabel = document.getElementById("weekLabel");
+    const weekPicker = document.getElementById("weekPicker");
+    const todayBtn = document.getElementById("todayBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const lastSaved = document.getElementById("lastSaved");
 
-  <div class="card">
-    <h2>Year‑to‑Date</h2>
-    <div class="metric" id="ytd">$0</div>
-    <div class="label">Company total</div>
-  </div>
-</section>
+    const modalBack = document.getElementById("modalBack");
+    const modalTitle = document.getElementById("modalTitle");
+    const closeModal = document.getElementById("closeModal");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const saveBtn = document.getElementById("saveBtn");
 
-<!-- Ambient Sound -->
-<audio id="ambience" loop>
-  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_4b7b6d33d2.mp3" type="audio/mpeg">
-</audio>
+    const fDate = document.getElementById("fDate");
+    const fTime = document.getElementById("fTime");
+    const fTruckType = document.getElementById("fTruckType");
+    const fVendor = document.getElementById("fVendor");
+    const fPO = document.getElementById("fPO");
 
-<script>
-  // Live numbers (replace with real data later)
-  setInterval(() => {
-    weekly.innerText = "$" + (22000 + Math.random() * 4000 | 0).toLocaleString();
-    mtd.innerText = "$" + (145000 + Math.random() * 8000 | 0).toLocaleString();
-    ytd.innerText = "$" + (1020000 + Math.random() * 20000 | 0).toLocaleString();
-    updated.innerText = new Date().toLocaleTimeString();
-  }, 2000);
+    let state = loadState();
+    let currentWeekStart = mondayOf(new Date());
+    let modalContext = { mode: "add", dayISO: "", truckId: "" };
 
-  function toggleDark() {
-    document.body.classList.toggle("dark");
-  }
-
-  const audio = document.getElementById("ambience");
-  let playing = false;
-
-  function toggleSound() {
-    if (!playing) {
-      audio.volume = 0.15;
-      audio.play();
-    } else {
-      audio.pause();
+    // ---- Helpers
+    function pad(n){ return String(n).padStart(2,"0"); }
+    function toISODate(d){
+      const x = new Date(d);
+      return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}`;
     }
-    playing = !playing;
-  }
-</script>
+    function prettyDate(d){
+      const x = new Date(d);
+      return x.toLocaleDateString(undefined, { month:"short", day:"2-digit" });
+    }
+    function prettyLong(d){
+      const x = new Date(d);
+      return x.toLocaleDateString(undefined, { weekday:"long", month:"short", day:"2-digit", year:"numeric" });
+    }
+    function mondayOf(date){
+      const d = new Date(date);
+      d.setHours(0,0,0,0);
+      const day = d.getDay(); // 0=Sun..6=Sat
+      const diff = (day === 0 ? -6 : 1) - day; // move to Monday
+      d.setDate(d.getDate() + diff);
+      return d;
+    }
+    function addDays(date, n){
+      const d = new Date(date);
+      d.setDate(d.getDate() + n);
+      return d;
+    }
+    function uid(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
 
+    function loadState(){
+      try{
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { weeks: {} };
+      }catch{
+        return { weeks: {} };
+      }
+    }
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      lastSaved.textContent = "Saved " + new Date().toLocaleTimeString();
+    }
+
+    function getWeekKey(weekStartDate){
+      return toISODate(weekStartDate);
+    }
+    function ensureWeek(weekStartDate){
+      const key = getWeekKey(weekStartDate);
+      if(!state.weeks[key]){
+        state.weeks[key] = { days: {} };
+      }
+      // ensure each day array exists
+      for(let i=0;i<7;i++){
+        const dayISO = toISODate(addDays(weekStartDate, i));
+        if(!state.weeks[key].days[dayISO]) state.weeks[key].days[dayISO] = [];
+      }
+      return state.weeks[key];
+    }
+
+    function setWeek(date){
+      currentWeekStart = mondayOf(date);
+      const wkKey = getWeekKey(currentWeekStart);
+      ensureWeek(currentWeekStart);
+
+      // set picker to a date within this week (Monday)
+      weekPicker.value = wkKey;
+
+      const end = addDays(currentWeekStart, 6);
+      weekLabel.textContent = `${prettyDate(currentWeekStart)} → ${prettyDate(end)}`;
+
+      renderWeek();
+      saveState();
+    }
+
+    // ---- Render
+    const weekdayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+    function renderWeek(){
+      const wk = ensureWeek(currentWeekStart);
+      weekGrid.innerHTML = "";
+
+      for(let i=0;i<7;i++){
+        const dayDate = addDays(currentWeekStart, i);
+        const dayISO = toISODate(dayDate);
+        const trucks = wk.days[dayISO] || [];
+
+        const card = document.createElement("article");
+        card.className = "dayCard";
+
+        card.innerHTML = `
+          <div class="dayHeader">
+            <div class="dayTopRow">
+              <div class="dayName">${weekdayNames[i]}</div>
+              <div class="dayDate">${prettyLong(dayDate)}</div>
+            </div>
+            <div class="divider"></div>
+            <div class="dayActions">
+              <button class="miniBtn" data-action="add" data-day="${dayISO}">＋ Add Truck</button>
+              <button class="miniBtn" data-action="sort" data-day="${dayISO}" title="Sort by Expected Time">⏱ Sort</button>
+            </div>
+          </div>
+          <div class="truckList" id="list-${dayISO}">
+            ${trucks.length ? "" : `<div class="emptyState">No inbound trucks yet. Click <b>＋ Add Truck</b> to add one.</div>`}
+          </div>
+        `;
+
+        weekGrid.appendChild(card);
+
+        // fill list
+        const list = card.querySelector(`#list-${CSS.escape(dayISO)}`);
+        if(trucks.length){
+          list.innerHTML = "";
+          trucks.forEach(t => list.appendChild(renderTruckRow(dayISO, t)));
+        }
+
+        // attach handlers on card buttons
+        card.querySelectorAll("button[data-action]").forEach(btn=>{
+          btn.addEventListener("click", () => {
+            const action = btn.dataset.action;
+            const day = btn.dataset.day;
+            if(action === "add") openModal("add", day);
+            if(action === "sort") {
+              sortDayByTime(day);
+              renderWeek();
+              saveState();
+            }
+          });
+        });
+      }
+    }
+
+    function renderTruckRow(dayISO, t){
+      const row = document.createElement("div");
+      row.className = "truckRow" + (t.received ? " received" : "");
+      row.dataset.id = t.id;
+
+      const timeDisplay = t.expectedTime ? t.expectedTime : "—";
+      row.innerHTML = `
+        <div class="cell">
+          <div class="k">Truck Type</div>
+          <div class="v" title="${escapeHtml(t.truckType || "")}">${escapeHtml(t.truckType || "—")}</div>
+        </div>
+        <div class="cell">
+          <div class="k">Vendor</div>
+          <div class="v" title="${escapeHtml(t.vendor || "")}">${escapeHtml(t.vendor || "—")}</div>
+        </div>
+        <div class="cell">
+          <div class="k">PO</div>
+          <div class="v" title="${escapeHtml(t.po || "")}">${escapeHtml(t.po || "—")}</div>
+        </div>
+        <div class="cell">
+          <div class="k">Expected</div>
+          <div class="v">${escapeHtml(timeDisplay)}</div>
+        </div>
+        <div class="cell recv">
+          <div>
+            <div class="k">Received</div>
+            <div class="rowTools">
+              <button class="iconBtn" data-act="edit" title="Edit">✎ Edit</button>
+              <button class="iconBtn" data-act="del" title="Delete">🗑 Delete</button>
+            </div>
+          </div>
+          <div class="checkWrap">
+            <input class="chk" type="checkbox" ${t.received ? "checked" : ""} aria-label="Received checkbox">
+          </div>
+        </div>
+      `;
+
+      // checkbox toggle
+      const chk = row.querySelector(".chk");
+      chk.addEventListener("change", () => {
+        updateTruck(dayISO, t.id, { received: chk.checked });
+        renderWeek();
+        saveState();
+      });
+
+      // edit/delete
+      row.querySelectorAll("button[data-act]").forEach(b=>{
+        b.addEventListener("click", () => {
+          const act = b.dataset.act;
+          if(act === "edit") openModal("edit", dayISO, t.id);
+          if(act === "del") {
+            if(confirm("Delete this truck entry?")){
+              deleteTruck(dayISO, t.id);
+              renderWeek();
+              saveState();
+            }
+          }
+        });
+      });
+
+      return row;
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ---- Data operations
+    function getWeek(){
+      return ensureWeek(currentWeekStart);
+    }
+
+    function addTruck(dayISO, truck){
+      const wk = getWeek();
+      wk.days[dayISO].push(truck);
+    }
+
+    function updateTruck(dayISO, id, patch){
+      const wk = getWeek();
+      const idx = wk.days[dayISO].findIndex(x=>x.id===id);
+      if(idx >= 0){
+        wk.days[dayISO][idx] = { ...wk.days[dayISO][idx], ...patch };
+      }
+    }
+
+    function deleteTruck(dayISO, id){
+      const wk = getWeek();
+      wk.days[dayISO] = wk.days[dayISO].filter(x=>x.id!==id);
+    }
+
+    function sortDayByTime(dayISO){
+      const wk = getWeek();
+      wk.days[dayISO].sort((a,b)=>{
+        const ta = a.expectedTime || "99:99";
+        const tb = b.expectedTime || "99:99";
+        return ta.localeCompare(tb);
+      });
+    }
+
+    // ---- Modal
+    function openModal(mode, dayISO, truckId=""){
+      modalContext = { mode, dayISO, truckId };
+
+      const dayDate = new Date(dayISO + "T00:00:00");
+      fDate.value = prettyLong(dayDate);
+
+      if(mode === "add"){
+        modalTitle.textContent = "Add Truck";
+        fTime.value = "";
+        fTruckType.value = "";
+        fVendor.value = "";
+        fPO.value = "";
+      } else {
+        modalTitle.textContent = "Edit Truck";
+        const wk = getWeek();
+        const t = (wk.days[dayISO] || []).find(x=>x.id===truckId);
+        fTime.value = t?.expectedTime || "";
+        fTruckType.value = t?.truckType || "";
+        fVendor.value = t?.vendor || "";
+        fPO.value = t?.po || "";
+      }
+
+      modalBack.style.display = "flex";
+      setTimeout(()=>fTruckType.focus(), 0);
+    }
+
+    function closeModalFn(){
+      modalBack.style.display = "none";
+    }
+
+    function saveModal(){
+      const truck = {
+        expectedTime: (fTime.value || "").trim(),
+        truckType: (fTruckType.value || "").trim(),
+        vendor: (fVendor.value || "").trim(),
+        po: (fPO.value || "").trim(),
+      };
+
+      if(!truck.truckType && !truck.vendor && !truck.po && !truck.expectedTime){
+        alert("Add at least one field (Truck Type, Vendor, PO, or Expected Time).");
+        return;
+      }
+
+      if(modalContext.mode === "add"){
+        addTruck(modalContext.dayISO, {
+          id: uid(),
+          ...truck,
+          received: false,
+          createdAt: Date.now()
+        });
+      } else {
+        updateTruck(modalContext.dayISO, modalContext.truckId, truck);
+      }
+
+      closeModalFn();
+      renderWeek();
+      saveState();
+    }
+
+    // Modal events
+    closeModal.addEventListener("click", closeModalFn);
+    cancelBtn.addEventListener("click", closeModalFn);
+    modalBack.addEventListener("click", (e)=>{ if(e.target === modalBack) closeModalFn(); });
+    saveBtn.addEventListener("click", saveModal);
+    document.addEventListener("keydown", (e)=>{
+      if(modalBack.style.display === "flex" && e.key === "Escape") closeModalFn();
+      if(modalBack.style.display === "flex" && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){
+        e.preventDefault(); saveModal();
+      }
+    });
+
+    // Toolbar events
+    weekPicker.addEventListener("change", () => {
+      const d = weekPicker.value ? new Date(weekPicker.value + "T00:00:00") : new Date();
+      setWeek(d);
+    });
+
+    todayBtn.addEventListener("click", () => setWeek(new Date()));
+
+    clearBtn.addEventListener("click", () => {
+      const key = getWeekKey(currentWeekStart);
+      if(confirm("Clear ALL truck entries for this week?")){
+        delete state.weeks[key];
+        saveState();
+        setWeek(currentWeekStart);
+      }
+    });
+
+    exportBtn.addEventListener("click", async () => {
+      const key = getWeekKey(currentWeekStart);
+      const wk = ensureWeek(currentWeekStart);
+      const payload = { weekStart: key, ...wk };
+      const txt = JSON.stringify(payload, null, 2);
+      try{
+        await navigator.clipboard.writeText(txt);
+        alert("Week data copied to clipboard ✅");
+      }catch{
+        prompt("Copy this JSON:", txt);
+      }
+    });
+
+    // ---- Init
+    // Seed picker with Monday of current week
+    setWeek(new Date());
+
+    // Optional: If you want an example row each Monday (commented out)
+    // const wk = getWeek();
+    // const mondayISO = toISODate(currentWeekStart);
+    // if(wk.days[mondayISO].length === 0){
+    //   addTruck(mondayISO, { id: uid(), truckType:"CC Racks", vendor:"Anchor", po:"23156", expectedTime:"09:30", received:false, createdAt:Date.now() });
+    //   saveState();
+    //   renderWeek();
+    // }
+  </script>
 </body>
 </html>
