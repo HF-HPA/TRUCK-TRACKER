@@ -11,55 +11,111 @@
   <style>
     :root {
       --bg: #F4F7F3;
+      --card: #ffffff;
       --green: #2F6F4E;
       --sage: #A8C3A1;
       --earth: #C9B89B;
       --text: #1F2933;
+      --muted: #6b7280;
+    }
+
+    body.dark {
+      --bg: #0F1A14;
+      --card: #16251D;
+      --green: #7CBF9E;
+      --sage: #3E6B56;
+      --earth: #8A7F63;
+      --text: #E5E7EB;
+      --muted: #9CA3AF;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      background: var(--bg);
       font-family: Inter, sans-serif;
+      background: var(--bg);
       color: var(--text);
+      transition: background 0.6s ease, color 0.6s ease;
+      overflow-x: hidden;
+    }
+
+    /* Greenhouse light */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(168,195,161,0.25), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(201,184,155,0.25), transparent 55%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     header {
-      padding: 32px 48px;
+      padding: 36px 48px;
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
       font-family: "Playfair Display", serif;
-      font-size: 40px;
+      font-size: 42px;
       margin: 0;
       color: var(--green);
     }
 
     .subtitle {
-      color: #6b7280;
-      margin-top: 6px;
+      margin-top: 8px;
+      color: var(--muted);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .controls {
+      margin-left: auto;
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      background: var(--card);
+      border: 1px solid rgba(0,0,0,0.08);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      padding: 32px 48px;
+      gap: 28px;
+      padding: 24px 48px 80px;
+      position: relative;
+      z-index: 1;
     }
 
     .card {
-      background: white;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: var(--card);
+      border-radius: 22px;
+      padding: 26px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+      animation: fadeUp 0.7s ease both;
     }
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .card h2 {
@@ -69,30 +125,64 @@
     }
 
     .metric {
-      font-size: 36px;
+      font-size: 38px;
       font-weight: 600;
       margin-top: 12px;
     }
 
     .label {
-      color: #6b7280;
+      color: var(--muted);
       font-size: 14px;
+    }
+
+    /* Decorative plants */
+    .plant {
+      position: fixed;
+      bottom: -20px;
+      opacity: 0.12;
+      z-index: 0;
+    }
+
+    .plant.left {
+      left: -40px;
+      width: 220px;
+    }
+
+    .plant.right {
+      right: -40px;
+      width: 260px;
     }
   </style>
 </head>
 
 <body>
 
+<!-- Decorative SVG Plants -->
+<svg class="plant left" viewBox="0 0 200 400">
+  <path d="M100 400 C60 300 120 200 80 100" stroke="#2F6F4E" stroke-width="14" fill="none"/>
+  <path d="M100 400 C140 300 80 200 120 100" stroke="#2F6F4E" stroke-width="14" fill="none"/>
+</svg>
+
+<svg class="plant right" viewBox="0 0 200 400">
+  <path d="M100 400 C50 260 140 180 90 60" stroke="#2F6F4E" stroke-width="16" fill="none"/>
+</svg>
+
 <header>
   <h1>Company Greenhouse 🌿</h1>
-  <div class="subtitle">Live performance & weekly pulse</div>
+  <div class="subtitle">
+    Live performance · Last updated <span id="updated"></span>
+    <div class="controls">
+      <button onclick="toggleDark()">🌙 Night</button>
+      <button onclick="toggleSound()">🔊 Ambience</button>
+    </div>
+  </div>
 </header>
 
 <section class="grid">
   <div class="card">
     <h2>Weekly Sales</h2>
-    <div class="metric" id="weeklySales">$0</div>
-    <div class="label">Updated live</div>
+    <div class="metric" id="weekly">$0</div>
+    <div class="label">Week to date</div>
   </div>
 
   <div class="card">
@@ -108,18 +198,36 @@
   </div>
 </section>
 
+<!-- Ambient Sound -->
+<audio id="ambience" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_4b7b6d33d2.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-  // Mock live updates (replace with Supabase/Firebase later)
+  // Live numbers (replace with real data later)
   setInterval(() => {
-    document.getElementById("weeklySales").innerText =
-      "$" + (20000 + Math.floor(Math.random() * 5000)).toLocaleString();
-
-    document.getElementById("mtd").innerText =
-      "$" + (120000 + Math.floor(Math.random() * 10000)).toLocaleString();
-
-    document.getElementById("ytd").innerText =
-      "$" + (980000 + Math.floor(Math.random() * 25000)).toLocaleString();
+    weekly.innerText = "$" + (22000 + Math.random() * 4000 | 0).toLocaleString();
+    mtd.innerText = "$" + (145000 + Math.random() * 8000 | 0).toLocaleString();
+    ytd.innerText = "$" + (1020000 + Math.random() * 20000 | 0).toLocaleString();
+    updated.innerText = new Date().toLocaleTimeString();
   }, 2000);
+
+  function toggleDark() {
+    document.body.classList.toggle("dark");
+  }
+
+  const audio = document.getElementById("ambience");
+  let playing = false;
+
+  function toggleSound() {
+    if (!playing) {
+      audio.volume = 0.15;
+      audio.play();
+    } else {
+      audio.pause();
+    }
+    playing = !playing;
+  }
 </script>
 
 </body>
